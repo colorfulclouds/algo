@@ -13,28 +13,13 @@ private:
 		int key;
 		int value;
 		node *left , *right;
-		int N;
 
 	public:
-		node(int key , int value , int N)
+		node(int key , int value)
 		{
 			this->key = key;
 			this->value = value;
-			this->N = N;
-
 			this->left = this->right = NULL; 
-		}
-		~node()
-		{
-			if(left)
-				delete left;
-			if(right)
-				delete right;
-		}
-
-		int get_N()
-		{
-			return N;
 		}
 
 		int get_key()
@@ -71,11 +56,6 @@ private:
 		{
 			this->value = value;
 		}
-
-		void set_N(int N)
-		{
-			this->N = N;
-		}
 	};//end class node 
 
 private:
@@ -92,19 +72,6 @@ public:
 	}
 
 	//member function
-
-	int size()
-	{
-		return size(root);
-	}
-
-	int size(node *x)
-	{
-		if(x == NULL)
-			return 0;
-		else
-			return x->get_N();
-	}
 
 	int get_value(int key)
 	{
@@ -131,7 +98,7 @@ public:
 	node * put(node *x , int key , int value)
 	{
 		if(x == NULL)
-			return new node(key , value , 1);
+			return new node(key , value);
 		
 		if(x->get_key() > key)
 			x->set_left( put(x->get_left() , key , value) );
@@ -139,8 +106,6 @@ public:
 			x->set_right( put(x->get_right() , key , value) );
 		else
 			x->set_value(value);
-
-		x->set_N(size(x->get_left()) + size(x->get_right()) + 1);
 
 		return x;
 	}
@@ -219,41 +184,6 @@ public:
 			return x;
 	}
 
-	int select(int k)
-	{
-		return select(root , k)->get_key();
-	}
-	node * select(node *x , int k)
-	{
-		if(x == NULL)
-			return NULL;
-		
-		int t = size(x->get_left());
-		if(t>k)
-			return select(x->get_left() , k);
-		else if(t<k)
-			return select(x->get_right() , k -t - 1);
-		else
-			return x;
-	}
-
-	int rank(int key)
-	{
-		return rank(key , root);
-	}
-	int rank(int key , node *x)
-	{
-		if(x == NULL)
-			return 0;
-		
-		if(key < x->get_key())
-			return rank(key , x->get_left());
-		else if(key > x->get_key())
-			return 1+size(x->get_left()) + rank(key , x->get_right());
-		else
-			return size(x->get_left());
-	}
-	
 	void delete_min()
 	{
 		root = delete_min(root);
@@ -265,7 +195,6 @@ public:
 			return x->get_right();
 
 		x->set_left(delete_min(x->get_left()));
-		x->set_N( size(x->get_left()) + size(x->get_right()) + 1);
 		return x;
 	}
 
@@ -280,7 +209,6 @@ public:
 			return x->get_left();
 
 		x->set_right(delete_max(x->get_right()));
-		x->set_N( size(x->get_right()) + size(x->get_left()) + 1);
 		return x;
 	}
 
@@ -308,7 +236,6 @@ public:
 			x->set_right(delete_min(t->get_right()));
 			x->set_left(t->get_left());
 		}
-		x->set_N(size(x->get_left()) + size(x->get_right()) + 1);
 		return x;
 	}
 

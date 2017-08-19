@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -108,24 +109,66 @@ public:
 
 	int get_value(int key)
 	{
-		return get_value(root , key);
+		node *x = root;
+
+		while(x)
+		{
+			if(key == x->get_key())
+				return x->get_value();
+			else if(key < x->get_key())
+				x = x->get_left();
+			else if(key > x->get_key())
+				x = x->get_right();
+		}
+
+		return -1;
 	}
 
-	int get_value(node *x , int key)
-	{
-		if(x == NULL)	//no exist
-			return -1;
-		if(x->get_key() > key)
-			return get_value(x->get_left() , key);
-		else if(x->get_key() < key)
-			return get_value(x->get_right() , key);
-		else
-			return x->get_value();
-	}
-
+	
 	void put(int key , int value)
 	{
-		root = put(root , key , value);
+		if(root == NULL)
+		{
+			root = new node(key , value , 1);
+			return ;
+		}
+		node *x = root;
+		stack<node *> save;
+		//insert
+		while(x)
+		{
+			if(x->get_key() > key)
+			{
+				save.push(x);
+				x = x->get_left();
+			}
+			else if(x->get_key() < key)
+			{
+				save.push(x);
+				x =x->get_right();
+			}
+			else
+			{
+				x->set_value(value);
+				return ;
+			}
+		}
+		node *p = new node(key , value , 1);
+		node *q = save.top();
+		if(key > q->get_key())
+			q->set_right(p);
+		else
+			q->set_left(p);
+
+		int i;
+		int length = save.size();
+		for(i=0;i<length;i++)
+		{
+			q = save.top();
+			q->set_N(q->get_N() + 1);
+			save.pop();
+		}
+		
 	}
 
 	node * put(node *x , int key , int value)
@@ -324,11 +367,30 @@ public:
 			keys(x->get_right() , q ,lo_key , hi_key);
 	}
 	
+	void print()
+	{
+		print(root);
+	}
+	void print(node *x)
+	{
+		if(x == NULL)
+			return ;
+		print(x->get_left());
+		printf("key:%d value:%d N:%d\n", x->get_key() , x->get_value() , x->get_N());
+		print(x->get_right());
+	}
 };
 
 int main(void)
 {
+	bst root;
+	root.put(2,6);
+	root.put(3,8);
+	root.put(3,9);
+	root.put(4,11);
+	root.put(6,28);
 	
+	root.print();
 
 	return 0;
 }
